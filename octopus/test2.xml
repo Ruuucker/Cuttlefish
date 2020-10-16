@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 7.80 scan initiated Fri Oct 16 04:41:51 2020 as: nmap -sn -&#45;traceroute -oX ./et2.xml 192.168.192.10-11 -->
+<nmaprun scanner="nmap" args="nmap -sn -&#45;traceroute -oX ./et2.xml 192.168.192.10-11" start="1602837711" startstr="Fri Oct 16 04:41:51 2020" version="7.80" xmloutputversion="1.04">
+<verbose level="0"/>
+<debugging level="0"/>
+<host starttime="1602837711" endtime="1602837711"><status state="up" reason="echo-reply" reason_ttl="127"/>
+<address addr="192.168.192.10" addrtype="ipv4"/>
+<hostnames>
+<hostname name="STP1920010.iclst.local" type="PTR"/>
+</hostnames>
+<trace proto="icmp">
+<hop ttl="1" ipaddr="192.168.221.254" rtt="1.09"/>
+<hop ttl="2" ipaddr="192.168.192.10" rtt="1.12" host="STP1920010.iclst.local"/>
+</trace>
+<times srtt="1753" rttvar="1098" to="100000"/>
+</host>
+<host starttime="1602837711" endtime="1602837711"><status state="up" reason="echo-reply" reason_ttl="127"/>
+<address addr="192.168.192.11" addrtype="ipv4"/>
+<hostnames>
+<hostname name="STP1920011.iclst.local" type="PTR"/>
+</hostnames>
+<trace proto="icmp">
+<hop ttl="1" ipaddr="192.168.221.254" rtt="1.09"/>
+<hop ttl="2" ipaddr="192.168.192.11" rtt="1.11" host="STP1920011.iclst.local"/>
+</trace>
+<times srtt="2733" rttvar="1862" to="100000"/>
+</host>
+<runstats><finished time="1602837711" timestr="Fri Oct 16 04:41:51 2020" elapsed="0.21" summary="Nmap done at Fri Oct 16 04:41:51 2020; 2 IP addresses (2 hosts up) scanned in 0.21 seconds" exit="success"/><hosts up="2" down="0" total="2"/>
+</runstats>
+</nmaprun>
