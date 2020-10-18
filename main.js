@@ -1,15 +1,22 @@
 const xmlConvert = require('xml-js');
 const fs = require('fs');
 
-var createGraph = require('ngraph.graph');
-var g = createGraph();
 
-g.addNode('hello');
-g.addNode('world');
-g.addLink('hello', 'world');
+const express = require('express');
+const app = express();
 
-var asciiGraphics = require('ngraph.ascii').graphics(g);
-asciiGraphics.run();
+app.get('/', (req, res) => {
+    res.sendFile('test.html', {root: __dirname })
+});
+
+app.get('/libs/vivagraph.js', (req, res) => {
+    res.sendFile('libs\\VivaGraphJS\\dist\\vivagraph.js', {root: __dirname })
+});
+
+app.listen(8080, () => console.log('App listening on port 8080'));
+
+
+// var createGraph = require('ngraph.graph');
 // const viva = require('vivagraphjs');
 // var graph = viva.Graph.graph();
 // graph.addLink(1, 2);

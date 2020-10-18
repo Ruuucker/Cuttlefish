@@ -10,7 +10,15 @@ app.get('/', (req, res) => {
 });
 
 app.get('/libs/vivagraph.js', (req, res) => {
-    res.sendFile('libs\\VivaGraphJS\\dist\\vivagraph.js', {root: __dirname })
+    res.sendFile('libs/VivaGraphJS/dist/vivagraph.js', {root: __dirname })
+});
+
+app.get('/testJSON', (req, res) => {
+    res.sendFile('./testJSON.json', {root: __dirname })
+});
+
+app.get('/image', (req, res) => {
+    res.sendFile('libs/none.jpg', {root: __dirname })
 });
 
 app.listen(8080, () => console.log('App listening on port 8080'));
@@ -24,10 +32,13 @@ app.listen(8080, () => console.log('App listening on port 8080'));
 // var renderer = viva.Graph.View.renderer(graph);
 // renderer.run();
 
-// // Импорт и преобразование
-// var nmapOutputXml = fs.readFileSync('./test3.xml', {encoding:'utf8', flag:'r'});
-// var nmapOutputJSON = xmlConvert.xml2json(nmapOutputXml, {compact: true, spaces: 0});
-// nmapOutputJSON = JSON.parse(nmapOutputJSON);
+// Импорт и преобразование
+var nmapOutputXml = fs.readFileSync('./test3.xml', {encoding:'utf8', flag:'r'});
+var nmapOutputJSON = xmlConvert.xml2json(nmapOutputXml, {compact: true, spaces: 0});
+
+// Запись JSON
+fs.writeFileSync('./testJSON.json', nmapOutputJSON);
+nmapOutputJSON = JSON.parse(nmapOutputJSON);
 
 
 // // console.log(nmapOutputJSON.nmaprun.host.trace.hop);
