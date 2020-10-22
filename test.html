@@ -28,6 +28,48 @@
                 TODO Решить баг с первинчым линком на графе
                 */
 
+                function drawHops (host) {
+                    let prevNode = '127.0.0.1';
+                    if (typeof host.trace == 'undefined') {
+                        let tmpLocalhost = graph.getNode('127.0.0.1');
+                        tmpLocalhost.nodeId = host.address._attributes.addr;
+                    }
+                    else {
+
+                        console.log(host.trace.hop);
+                        if (typeof host.trace.hop.length == 'undefined') {
+                            console.log('this is 1 hop');
+
+
+
+                            graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
+
+                            // Пиним ноду
+                            let middle = graph.getNode(prevNode);
+                            layout.pinNode(middle, true);
+                            // prevNode = hop.ipaddr;
+                        }
+                        else {
+                            for (let ii = 0; ii < host.trace.hop.length; ii++) {
+                                
+                                let hop = host.trace.hop[ii]._attributes;
+                                // console.log('NEW HOP');
+                                console.log(hop.ipaddr);
+                                
+                                // Тут делаю коннект этой ноды с предидущей
+                                // let wtf = ii + Math.random();
+                                // console.log(prevNode, hop.ipaddr);
+                                graph.addLink(prevNode, hop.ipaddr);
+
+                                // Пиним ноду
+                                let middle = graph.getNode(prevNode);
+                                layout.pinNode(middle, true);
+                                prevNode = hop.ipaddr;
+                            }
+                        }
+                    }
+                }
+
                 var graph = Viva.Graph.graph();
                 var layout = Viva.Graph.Layout.forceDirected(graph, {
                     springLength: 500,
@@ -87,7 +129,9 @@
                     // console.log(nmapOutputJSON); // this will log out the json object
 
                     if (typeof nmapOutputJSON.nmaprun.host.length == 'undefined') {
-                     console.log('this is 1 host');
+                        console.log('this is 1 host');
+                        let host = nmapOutputJSON.nmaprun.host;
+                        drawHops (host);
                     }
                     else {
 
@@ -96,30 +140,9 @@
                             // console.log(nmapOutputJSON.nmaprun.host[i]);
                             // nmapOutputJSON[i]
                             let host = nmapOutputJSON.nmaprun.host[i];
-
-                            // console.log('NEW HOST');
-                            // console.log(host);
-                            
-                            let prevNode = '127.0.0.1';
-                            for (let ii = 0; ii < host.trace.hop.length; ii++) {
-                                let hop = host.trace.hop[ii]._attributes;
-                                // console.log('NEW HOP');
-                                // console.log(hop);
-                                
-                                // Тут делаю коннект этой ноды с предидущей
-                                // let wtf = ii + Math.random();
-                                // console.log(prevNode, hop.ipaddr);
-                                graph.addLink(prevNode, hop.ipaddr);
-
-                                // Пиним ноду
-                                let middle = graph.getNode(prevNode);
-                                layout.pinNode(middle, true);
-                                prevNode = hop.ipaddr;
-                            }
+                            drawHops (host);
                         }
                     }
-
-
                 });
 
                 renderer.run();
