@@ -6,10 +6,10 @@
 
         <script type='text/javascript'>
 
-            function loadJSON(callback) {   
+            function loadJSON(callback, path) {   
               var xobj = new XMLHttpRequest();
               xobj.overrideMimeType("application/json");
-              xobj.open('GET', '/nmapJSON', true);
+              xobj.open('GET', path, true);
               xobj.onreadystatechange = function () {
                 if (xobj.readyState == 4 && xobj.status == "200") {
                   callback(JSON.parse(xobj.responseText));
@@ -124,8 +124,31 @@
                                 ')');
                 });
 
+                /* Тут в теории можно сделать цикл реквестов всех сканов по типу
+                for (ni = 0; ni < nmapJSONOut.length; ni++) {
+                    loadJSON(function(nmapOutputJSON, nmapJSONOut[ni]) {
+                        // console.log(nmapOutputJSON); // this will log out the json object
 
-                loadJSON(function(nmapOutputJSON) {
+                        if (typeof nmapOutputJSON.nmaprun.host.length == 'undefined') {
+                            console.log('this is 1 host');
+                            let host = nmapOutputJSON.nmaprun.host;
+                            drawHops (host);
+                        }
+                        else {
+
+                            graph.addNode('127.0.0.1');
+                            for (let i = 0; i < nmapOutputJSON.nmaprun.host.length; i++) {
+                                // console.log(nmapOutputJSON.nmaprun.host[i]);
+                                // nmapOutputJSON[i]
+                                let host = nmapOutputJSON.nmaprun.host[i];
+                                drawHops (host);
+                            }
+                        }
+                    });
+                }
+
+                */
+                loadJSON(function(nmapOutputJSON, '/nmapJSON') {
                     // console.log(nmapOutputJSON); // this will log out the json object
 
                     if (typeof nmapOutputJSON.nmaprun.host.length == 'undefined') {
