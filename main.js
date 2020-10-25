@@ -3,7 +3,7 @@ const { startScan } = require('./scan.js');
 const { startServer } = require('./server.js');
 
 var dirToSave = '/tmp/';
-var diaps = ['192.168.1.0/24', '192.168.1.1'];
+var diaps = ['192.168.1.0/24', '8.8.8.8'];
 // var diaps = ['192.168.1.1'];
 
 var scansPromises = [];
@@ -21,6 +21,5 @@ Promise.all(scansPromises).then((xmlPaths) => {
 		let fileName = generateFileName();
 		jsonPaths.push(convertNmapOutput(dirToSave, xmlPaths[i], fileName));
 	}
-	console.log(jsonPaths);
 	startServer(jsonPaths);
 });

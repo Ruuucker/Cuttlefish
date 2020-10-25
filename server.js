@@ -4,6 +4,10 @@ const express = require('express');
 const app = express();
 
 function startServer (jsonPaths) {
+
+	// Впоследствии использовать это вместо постоянных ручных прописей всех реквестов 
+	app.use(express.static('libs'))
+
 	app.get('/', (req, res) => {
 	    res.sendFile('test.html', {root: __dirname })
 	});
@@ -20,15 +24,8 @@ function startServer (jsonPaths) {
 	    res.send(jsonPaths)
 	});
 
-	var t;
-	for (var i = jsonPaths.length - 1; i >= 0; i--) {
-		// Из за того что експресс не желает видеть переменные цикла for, буду действовать в обход
-		t = i;
-		app.get(jsonPaths[t], (req, res) => {
-			console.log(jsonPaths[t]);
-		    res.sendFile(jsonPaths[t])
-		});
-	}
+	// Из за того что експресс не желает видеть переменные цикла for, буду действовать в обход
+	app.use(express.static('/'))
 
 	app.listen(8080, () => console.log('App listening on port 8080 \nhttp://localhost:8080'));
 }

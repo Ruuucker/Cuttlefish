@@ -62,10 +62,11 @@
                                 // console.log(prevNode, hop.ipaddr);
                                 graph.addLink(prevNode, hop.ipaddr);
 
-                                // Пиним ноду
-                                let middle = graph.getNode(prevNode);
-                                layout.pinNode(middle, true);
                                 prevNode = hop.ipaddr;
+                             
+                                // Пиним ноду
+                                // let middle = graph.getNode(prevNode);
+                                // layout.pinNode(middle, true);
                             }
                         }
                     }
@@ -127,7 +128,6 @@
 
 
                 loadJSON(function(arrayOfJSON) {
-                    console.log(arrayOfJSON);
                     // Тут в теории можно сделать цикл реквестов всех сканов по типу
                     for (ni = 0; ni < arrayOfJSON.length; ni++) {
                         loadJSON(function(nmapOutputJSON) {
