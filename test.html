@@ -7,6 +7,7 @@
         <script type='text/javascript'>
 
             function loadJSON(callback, path) {   
+              console.log(path);
               var xobj = new XMLHttpRequest();
               xobj.overrideMimeType("application/json");
               xobj.open('GET', path, true);
@@ -28,68 +29,68 @@
                 TODO Решить баг с первинчым линком на графе
                 */
 
-                // function drawHops (host) {
-                //     let prevNode = '127.0.0.1';
-                //     if (typeof host.trace == 'undefined') {
-                //         let tmpLocalhost = graph.getNode('127.0.0.1');
-                //         tmpLocalhost.nodeId = host.address._attributes.addr;
-                //     }
-                //     else {
+                function drawHops (host) {
+                    let prevNode = '127.0.0.1';
+                    if (typeof host.trace == 'undefined') {
+                        let tmpLocalhost = graph.getNode('127.0.0.1');
+                        tmpLocalhost.nodeId = host.address._attributes.addr;
+                    }
+                    else {
 
-                //         console.log(host.trace.hop);
-                //         if (typeof host.trace.hop.length == 'undefined') {
-                //             console.log('this is 1 hop');
+                        console.log(host.trace.hop);
+                        if (typeof host.trace.hop.length == 'undefined') {
+                            console.log('this is 1 hop');
 
 
 
-                //             graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
+                            graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
 
-                //             // Пиним ноду
-                //             let middle = graph.getNode(prevNode);
-                //             layout.pinNode(middle, true);
-                //             // prevNode = hop.ipaddr;
-                //         }
-                //         else {
-                //             for (let ii = 0; ii < host.trace.hop.length; ii++) {
+                            // Пиним ноду
+                            let middle = graph.getNode(prevNode);
+                            layout.pinNode(middle, true);
+                            // prevNode = hop.ipaddr;
+                        }
+                        else {
+                            for (let ii = 0; ii < host.trace.hop.length; ii++) {
                                 
-                //                 let hop = host.trace.hop[ii]._attributes;
-                //                 // console.log('NEW HOP');
-                //                 console.log(hop.ipaddr);
+                                let hop = host.trace.hop[ii]._attributes;
+                                // console.log('NEW HOP');
+                                console.log(hop.ipaddr);
                                 
-                //                 // Тут делаю коннект этой ноды с предидущей
-                //                 // let wtf = ii + Math.random();
-                //                 // console.log(prevNode, hop.ipaddr);
-                //                 graph.addLink(prevNode, hop.ipaddr);
+                                // Тут делаю коннект этой ноды с предидущей
+                                // let wtf = ii + Math.random();
+                                // console.log(prevNode, hop.ipaddr);
+                                graph.addLink(prevNode, hop.ipaddr);
 
-                //                 // Пиним ноду
-                //                 let middle = graph.getNode(prevNode);
-                //                 layout.pinNode(middle, true);
-                //                 prevNode = hop.ipaddr;
-                //             }
-                //         }
-                //     }
-                // }
+                                // Пиним ноду
+                                let middle = graph.getNode(prevNode);
+                                layout.pinNode(middle, true);
+                                prevNode = hop.ipaddr;
+                            }
+                        }
+                    }
+                }
 
-                // var graph = Viva.Graph.graph();
-                // var layout = Viva.Graph.Layout.forceDirected(graph, {
-                //     springLength: 500,
-                //     springCoeff : 0.0008,
-                //     gravity : -10,
-                //     // This is the main part of this example. We are telling force directed
-                //     // layout, that we want to change length of each physical spring
-                //     // by overriding `springTransform` method:
-                //     springTransform: function (link, spring) {
-                //       spring.length = 100;
-                //     }
-                // });
+                var graph = Viva.Graph.graph();
+                var layout = Viva.Graph.Layout.forceDirected(graph, {
+                    springLength: 500,
+                    springCoeff : 0.0008,
+                    gravity : -10,
+                    // This is the main part of this example. We are telling force directed
+                    // layout, that we want to change length of each physical spring
+                    // by overriding `springTransform` method:
+                    springTransform: function (link, spring) {
+                      spring.length = 100;
+                    }
+                });
 
-                // var graphics = Viva.Graph.View.svgGraphics(),
-                //     nodeSize = 20;
+                var graphics = Viva.Graph.View.svgGraphics(),
+                    nodeSize = 20;
 
-                // var renderer = Viva.Graph.View.renderer(graph, {
-                //         layout   : layout,
-                //         graphics : graphics,
-                // });
+                var renderer = Viva.Graph.View.renderer(graph, {
+                        layout   : layout,
+                        graphics : graphics,
+                });
 
                 // layout.placeNode(function(node) {
                 //     // node.id - points to its position but you can do your
@@ -101,58 +102,57 @@
                 //     return {x: xx, y: yy};
                 // });
 
-                // graphics.node(function(node) {
-                //   // This time it's a group of elements: http://www.w3.org/TR/SVG/struct.html#Groups
-                //   var ui = Viva.Graph.svg('g'),
-                //       // Create SVG text element with user id as content
-                //       svgText = Viva.Graph.svg('text').attr('y', '-4px').text(node.id),
-                //       img = Viva.Graph.svg('image')
-                //          .attr('width', nodeSize)
-                //          .attr('height', nodeSize)
-                //          .link('http://localhost:8080/image');
+                graphics.node(function(node) {
+                  // This time it's a group of elements: http://www.w3.org/TR/SVG/struct.html#Groups
+                  var ui = Viva.Graph.svg('g'),
+                      // Create SVG text element with user id as content
+                      svgText = Viva.Graph.svg('text').attr('y', '-4px').text(node.id),
+                      img = Viva.Graph.svg('image')
+                         .attr('width', nodeSize)
+                         .attr('height', nodeSize)
+                         .link('http://localhost:8080/image');
 
-                //     ui.append(svgText);
-                //     ui.append(img);
-                //     return ui;
+                    ui.append(svgText);
+                    ui.append(img);
+                    return ui;
 
-                // }).placeNode(function(nodeUI, pos) {
-                // // 'g' element doesn't have convenient (x,y) attributes, instead
-                // // we have to deal with transforms: http://www.w3.org/TR/SVG/coords.html#SVGGlobalTransformAttribute
-                //     nodeUI.attr('transform',
-                //                 'translate(' +
-                //                       (pos.x - nodeSize/2) + ',' + (pos.y - nodeSize/2) +
-                //                 ')');
-                // });
-
-
-                loadJSON(function(arrayOfJSON, '/test') {
-                    console.log(arrayOfJSON);
-                    // Тут в теории можно сделать цикл реквестов всех сканов по типу
-                    // for (ni = 0; ni < nmapJSONOut.length; ni++) {
-                    //     loadJSON(function(nmapOutputJSON, nmapJSONOut[ni]) {
-                    //         // console.log(nmapOutputJSON); // this will log out the json object
-
-                    //         if (typeof nmapOutputJSON.nmaprun.host.length == 'undefined') {
-                    //             console.log('this is 1 host');
-                    //             let host = nmapOutputJSON.nmaprun.host;
-                    //             drawHops (host);
-                    //         }
-                    //         else {
-
-                    //             graph.addNode('127.0.0.1');
-                    //             for (let i = 0; i < nmapOutputJSON.nmaprun.host.length; i++) {
-                    //                 // console.log(nmapOutputJSON.nmaprun.host[i]);
-                    //                 // nmapOutputJSON[i]
-                    //                 let host = nmapOutputJSON.nmaprun.host[i];
-                    //                 drawHops (host);
-                    //             }
-                    //         }
-                    //     });
-                    // }
-
+                }).placeNode(function(nodeUI, pos) {
+                // 'g' element doesn't have convenient (x,y) attributes, instead
+                // we have to deal with transforms: http://www.w3.org/TR/SVG/coords.html#SVGGlobalTransformAttribute
+                    nodeUI.attr('transform',
+                                'translate(' +
+                                      (pos.x - nodeSize/2) + ',' + (pos.y - nodeSize/2) +
+                                ')');
                 });
 
-                // renderer.run();
+
+                loadJSON(function(arrayOfJSON) {
+                    console.log(arrayOfJSON);
+                    // Тут в теории можно сделать цикл реквестов всех сканов по типу
+                    for (ni = 0; ni < arrayOfJSON.length; ni++) {
+                        loadJSON(function(nmapOutputJSON) {
+                            console.log(nmapOutputJSON);
+
+                            if (typeof nmapOutputJSON.nmaprun.host.length == 'undefined') {
+                                let host = nmapOutputJSON.nmaprun.host;
+                                drawHops (host);
+                            }
+                            else {
+
+                                graph.addNode('127.0.0.1');
+                                for (let i = 0; i < nmapOutputJSON.nmaprun.host.length; i++) {
+                                    // console.log(nmapOutputJSON.nmaprun.host[i]);
+                                    // nmapOutputJSON[i]
+                                    let host = nmapOutputJSON.nmaprun.host[i];
+                                    drawHops (host);
+                                }
+                            }
+                        }, arrayOfJSON[ni]);
+                    }
+
+                }, '/test');
+
+                renderer.run();
             }
 
 
