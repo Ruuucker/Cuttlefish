@@ -12,8 +12,13 @@ function startServer (pathToJSON) {
 	    res.sendFile('libs/VivaGraphJS/dist/vivagraph.js', {root: __dirname })
 	});
 
-	app.get('/nmapJSON', (req, res) => {
-	    res.sendFile(pathToJSON)
+	// app.get('/nmapJSONArray', (req, res) => {
+	//     res.sendFile(pathToJSON)
+	// });
+
+	app.get('/test', (req, res) => {
+	    let testArray = [1, 2];
+	    res.send(testArray)
 	});
 
 	app.get('/image', (req, res) => {
