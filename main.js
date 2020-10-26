@@ -3,7 +3,7 @@ const { startScan } = require('./scan.js');
 const { startServer } = require('./server.js');
 
 var dirToSave = '/tmp/';
-var diaps = ['192.168.1.0/24', '8.8.8.8'];
+var diaps = ['192.168.221.0/24', '172.31.31.0/24'];
 // var diaps = ['192.168.1.1'];
 
 var scansPromises = [];

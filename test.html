@@ -27,13 +27,78 @@
                 https://gojs.net/latest/index.html
 
                 TODO Решить баг с первинчым линком на графе
+
+		Here is how it going to be:
+		global circle
+		for (host in hosts) {
+			// Getting hops and traceroute
+			let hops = hosts.hops;
+			let trace = hosts.trace;
+
+			if (traceroute info exist) { // По идее такая информация всегда должна существовать
+				let prevNode = что-то;
+				let hops = [массив извесных (не анонимных) хостов, являющиеся хопами];
+				let ttls = кол-во хопов до цели;
+				for (ttl in range of (1, max(ttls) + 1)) {
+					if (ttl in ttls) {
+						// Ищем хоп по ттл
+						let hop = find_hop_by_ttl(hops, ttl);
+						// И если ноды нет в кэше, создавать ли его я еще подумаю
+						if (node is None) {
+							// Рисуем ноду
+						}
+					}
+					else {
+						// Добавление анонимной ноды, но только если у нас нет о ней информации (такая как такая же дистанция, например)
+						// Я не знаю зачем это, потом узнаю
+						pre_hop = None
+						pre_hop_distance = 0
+						for i in range(1, ttl + 1) {
+							pre_hop = find_hop_by_ttl(hops, ttl - i)
+							if pre_hop is not None:
+								pre_hop_distance = i
+						                break
+						}
+						
+						pre_hop = None
+						pre_hop_distance = 0                        
+						for i in range(1, ttl + 1) {                   
+							pre_hop = find_hop_by_ttl(hops, ttl - i)                    
+							if pre_hop is not None:                            
+								pre_hop_distance = i                        
+								break              
+						}
+						let parent_key = (pre_hop["ipaddr"], pre_hop_distance)
+						let child_key = None;
+
+						if (post_hop in not None) {
+							child_key = (pre_hop["ipaddr"], post_hop_distance)
+						}
+						if (parent_key in parent_key_cache) {
+							let node = ancestor_node_cache[child_key];
+						} elif (child_key in not None && child_key in child_key_cache) {
+							node = child_key_cache[child_key];
+							graph.addLink(node, prevNode);
+						} else {
+							// Рисую ноду
+							//graph.addLink();slkdjfksjd
+							if (child_key is not None)
+								child_key_cache[child_key] = node;
+						}
+
+					}
+					prevNode = node;
+				}
+			}
+		}
                 */
 
                 function drawHops (host) {
                     let prevNode = '127.0.0.1';
                     if (typeof host.trace == 'undefined') {
                         let tmpLocalhost = graph.getNode('127.0.0.1');
-                        tmpLocalhost.nodeId = host.address._attributes.addr;
+                    	// Here i can change the localhost ip
+			tmpLocalhost.nodeId = host.address._attributes.addr;
                     }
                     else {
 
@@ -48,7 +113,7 @@
                             // Пиним ноду
                             let middle = graph.getNode(prevNode);
                             layout.pinNode(middle, true);
-                            // prevNode = hop.ipaddr;
+                            //prevNode = hop.ipaddr;
                         }
                         else {
                             for (let ii = 0; ii < host.trace.hop.length; ii++) {
@@ -74,14 +139,14 @@
 
                 var graph = Viva.Graph.graph();
                 var layout = Viva.Graph.Layout.forceDirected(graph, {
-                    springLength: 500,
-                    springCoeff : 0.0008,
-                    gravity : -10,
+                    springLength: 1200,
+                    springCoeff : 0.0018,
+                    gravity : -20,
                     // This is the main part of this example. We are telling force directed
                     // layout, that we want to change length of each physical spring
                     // by overriding `springTransform` method:
                     springTransform: function (link, spring) {
-                      spring.length = 100;
+                      spring.length = 300;
                     }
                 });
 
@@ -93,18 +158,7 @@
                         graphics : graphics,
                 });
 
-                // layout.placeNode(function(node) {
-                //     // node.id - points to its position but you can do your
-                //     // random logic here. E.g. read from specific node.data
-                //     // attributes. This callback is expected to return object {x : .. , y : .. }
-                //     let xx = getRandomInt(0, 100);
-                //     let yy = getRandomInt(0, 100);
-
-                //     return {x: xx, y: yy};
-                // });
-
                 graphics.node(function(node) {
-                  // This time it's a group of elements: http://www.w3.org/TR/SVG/struct.html#Groups
                   var ui = Viva.Graph.svg('g'),
                       // Create SVG text element with user id as content
                       svgText = Viva.Graph.svg('text').attr('y', '-4px').text(node.id),
@@ -118,8 +172,6 @@
                     return ui;
 
                 }).placeNode(function(nodeUI, pos) {
-                // 'g' element doesn't have convenient (x,y) attributes, instead
-                // we have to deal with transforms: http://www.w3.org/TR/SVG/coords.html#SVGGlobalTransformAttribute
                     nodeUI.attr('transform',
                                 'translate(' +
                                       (pos.x - nodeSize/2) + ',' + (pos.y - nodeSize/2) +
