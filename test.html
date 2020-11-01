@@ -5,6 +5,7 @@
         <script src="libs/vivagraph.js"></script>
 
         <script type='text/javascript'>
+            "use strict";
 
             function loadJSON(callback, path) {   
               console.log(path);
@@ -181,7 +182,7 @@
 
                 loadJSON(function(arrayOfJSON) {
                     // Тут в теории можно сделать цикл реквестов всех сканов по типу
-                    for (ni = 0; ni < arrayOfJSON.length; ni++) {
+                    for (let ni = 0; ni < arrayOfJSON.length; ni++) {
                         loadJSON(function(nmapOutputJSON) {
                             console.log(nmapOutputJSON);
 

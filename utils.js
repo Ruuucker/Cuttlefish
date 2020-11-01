@@ -1,3 +1,5 @@
+"use strict";
+
 const xmlConvert = require('xml-js');
 const fs = require('fs');
 
