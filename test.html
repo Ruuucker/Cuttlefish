@@ -28,84 +28,21 @@
                 https://gojs.net/latest/index.html
 
                 TODO Решить баг с первинчым линком на графе
-
-		Here is how it going to be:
-		global circle
-		for (host in hosts) {
-			// Getting hops and traceroute
-			let hops = hosts.hops;
-			let trace = hosts.trace;
-
-			if (traceroute info exist) { // По идее такая информация всегда должна существовать
-				let prevNode = что-то;
-				let hops = [массив извесных (не анонимных) хостов, являющиеся хопами];
-				let ttls = кол-во хопов до цели;
-				for (ttl in range of (1, max(ttls) + 1)) {
-					if (ttl in ttls) {
-						// Ищем хоп по ттл
-						let hop = find_hop_by_ttl(hops, ttl);
-						// И если ноды нет в кэше, создавать ли его я еще подумаю
-						if (node is None) {
-							// Рисуем ноду
-						}
-					}
-					else {
-						// Добавление анонимной ноды, но только если у нас нет о ней информации (такая как такая же дистанция, например)
-						// Я не знаю зачем это, потом узнаю
-						pre_hop = None
-						pre_hop_distance = 0
-						for i in range(1, ttl + 1) {
-							pre_hop = find_hop_by_ttl(hops, ttl - i)
-							if pre_hop is not None:
-								pre_hop_distance = i
-						                break
-						}
-						
-						pre_hop = None
-						pre_hop_distance = 0                        
-						for i in range(1, ttl + 1) {                   
-							pre_hop = find_hop_by_ttl(hops, ttl - i)                    
-							if pre_hop is not None:                            
-								pre_hop_distance = i                        
-								break              
-						}
-						let parent_key = (pre_hop["ipaddr"], pre_hop_distance)
-						let child_key = None;
-
-						if (post_hop in not None) {
-							child_key = (pre_hop["ipaddr"], post_hop_distance)
-						}
-						if (parent_key in parent_key_cache) {
-							let node = ancestor_node_cache[child_key];
-						} elif (child_key in not None && child_key in child_key_cache) {
-							node = child_key_cache[child_key];
-							graph.addLink(node, prevNode);
-						} else {
-							// Рисую ноду
-							//graph.addLink();slkdjfksjd
-							if (child_key is not None)
-								child_key_cache[child_key] = node;
-						}
-
-					}
-					prevNode = node;
-				}
-			}
-		}
                 */
 
                 function drawHops (host) {
+                    console.log(host);
                     let prevNode = '127.0.0.1';
+
                     if (typeof host.trace == 'undefined') {
                         let tmpLocalhost = graph.getNode('127.0.0.1');
                     	// Here i can change the localhost ip
             			tmpLocalhost.nodeId = host.address._attributes.addr;
                     }
                     else {
-
-                        console.log(host.trace.hop);
+                        // console.log(host.trace.hop);
                         if (typeof host.trace.hop.length == 'undefined') {
-                            console.log('this is 1 hop');
+                            // console.log('this is 1 hop');
 
 
 
@@ -117,37 +54,47 @@
                             //prevNode = hop.ipaddr;
                         }
                         else {
-                            for (let ii = 0; ii < host.trace.hop.length; ii++) {
-                                
-                                let hop = host.trace.hop[ii]._attributes;
-                                // console.log('NEW HOP');
-                                console.log(hop.ipaddr);
-                                
-                                // Тут делаю коннект этой ноды с предидущей
-                                // let wtf = ii + Math.random();
-                                // console.log(prevNode, hop.ipaddr);
-                                graph.addLink(prevNode, hop.ipaddr);
+                            let hop = host.trace.hop;
+                            // Последний хоп это цель, поэтому мы берем оттуда истиное кол-во хопов
+                            let ttls = hop[hop.length - 1]._attributes.ttl;
+                            let target_ip = host.address._attributes.addr;
 
-                                prevNode = hop.ipaddr;
-                             
+                            // Покрывает все ноды кроме последней, из-за этого я дополняю граф последней целевой нодой
+                            for (let ttl = 1; ttl < ttls; ttl++) {
+
+                                // Если тру, нода норм
+                                // -1 потому что ttl считается с 1, и это сука неудобно
+                                if (typeof hop[ttl - 1] != 'undefined' && ttl == hop[ttl - 1]._attributes.ttl) {
+                                    graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
+                                    prevNode = hop[ttl - 1]._attributes.ipaddr;
+
+                                } else {
+                                    // Просто математический рандом для анонимных нод, потом нужно будет придумать чтонибудь
+                                    let tmp = Math.random();
+                                    graph.addLink(prevNode, tmp);
+                                    prevNode = tmp;
+                                }
                                 // Пиним ноду
                                 // let middle = graph.getNode(prevNode);
                                 // layout.pinNode(middle, true);
+                                
                             }
+                            // Костыль для добавления последней ноды-цели
+                            graph.addLink(prevNode, target_ip);
                         }
                     }
                 }
 
                 var graph = Viva.Graph.graph();
                 var layout = Viva.Graph.Layout.forceDirected(graph, {
-                    springLength: 1200,
-                    springCoeff : 0.0018,
-                    gravity : -20,
+                    springLength: 700,
+                    springCoeff : 0.00018,
+                    gravity : -4000,
                     // This is the main part of this example. We are telling force directed
                     // layout, that we want to change length of each physical spring
                     // by overriding `springTransform` method:
                     springTransform: function (link, spring) {
-                      spring.length = 300;
+                      spring.length = 100;
                     }
                 });
 
@@ -181,10 +128,10 @@
 
 
                 loadJSON(function(arrayOfJSON) {
-                    // Тут в теории можно сделать цикл реквестов всех сканов по типу
+                    // Тут цикл реквестов всех сканов
                     for (let ni = 0; ni < arrayOfJSON.length; ni++) {
                         loadJSON(function(nmapOutputJSON) {
-                            console.log(nmapOutputJSON);
+                            // console.log(nmapOutputJSON);
 
                             if (typeof nmapOutputJSON.nmaprun.host.length == 'undefined') {
                                 let host = nmapOutputJSON.nmaprun.host;
@@ -192,6 +139,7 @@
                             }
                             else {
 
+                                // testMain(nmapOutputJSON.nmaprun.host);
                                 graph.addNode('127.0.0.1');
                                 for (let i = 0; i < nmapOutputJSON.nmaprun.host.length; i++) {
                                     // console.log(nmapOutputJSON.nmaprun.host[i]);
