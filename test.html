@@ -29,74 +29,68 @@
 
                 TODO Решить баг с первинчым линком на графе
                 */
-		var prevNode;// = '127.0.0.1';
+		
 		function drawHops (host) {
-		    prevNode = '127.0.0.1';
-                    if (typeof host.trace == 'undefined') {
-                        //let tmpLocalhost = graph.getNode('127.0.0.1');
-                    	// Here i can change the localhost ip
-            		//	tmpLocalhost.nodeId = host.address._attributes.addr;
-                    }
+		    let prevNode = '127.0.0.1';
+            if (typeof host.trace == 'undefined') {
+                //let tmpLocalhost = graph.getNode('127.0.0.1');
+               	// Here i can change the localhost ip
+          		//	tmpLocalhost.nodeId = host.address._attributes.addr;
+            }
 		    // Exeption for 'alive-but-no-trace' node
-			else if (typeof host.trace.hop == 'undefined') {
-				let tmp = host.address._attributes.addr + 'No trace';
-				graph.addLink(prevNode, tmp);
-			}
-                    else {
-                        if (typeof host.trace.hop.length == 'undefined') {
-                            
-			    
-			    // If true, then this is exection for host with ttl == 2 and there is no array
-			    if (host.trace.hop._attributes.ttl != 1) {
-				// Add anon node, but i just say, this is zero and fuck off
-				let tmp = 'Anon'; 
-				graph.addLink(prevNode, tmp);
-				prevNode = tmp;
+		    else if (typeof host.trace.hop == 'undefined') {
+    			let tmp = host.address._attributes.addr + ' No trace';
+    			graph.addLink(prevNode, tmp);
+		    }
+            else {
+                if (typeof host.trace.hop.length == 'undefined') {
+               			             
+    			    // If true, then this is exection for host with ttl == 2 and there is no array
+    			    if (host.trace.hop._attributes.ttl != 1) {
+    				// Add anon node, but i just say, this is zero and fuck off
+    				let tmp = 'Anon'; 
+    				graph.addLink(prevNode, tmp);
+    				prevNode = tmp;
 			    }
 
-                            graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
+                graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
 
-                            // Пиним ноду
-                            let middle = graph.getNode(prevNode);
-                            layout.pinNode(middle, true);
-                            //prevNode = hop.ipaddr;
-                        }
-                        else {
-                            let hop = host.trace.hop;
-                            // Последний хоп это цель, поэтому мы берем оттуда истиное кол-во хопов
-                            let ttls = hop[hop.length - 1]._attributes.ttl;
-                            let target_ip = host.address._attributes.addr;
+                // Пиним ноду
+                let middle = graph.getNode(prevNode);
+                layout.pinNode(middle, true);
+            }
+            else {
+                            
+			    let hop = host.trace.hop;
+                // Последний хоп это цель, поэтому мы берем оттуда истиное кол-во хопов
+                let ttls = hop[hop.length - 1]._attributes.ttl;
+                let target_ip = host.address._attributes.addr;
 
-                            // Покрывает все ноды кроме последней, из-за этого я дополняю граф последней целевой нодой
-                            for (let ttl = 1; ttl < ttls; ttl++) {
+                // Покрывает все ноды кроме последней, из-за этого я дополняю граф последней целевой нодой
+                for (let ttl = 1; ttl < ttls; ttl++) {
+                    // Если тру, нода норм
+                    // -1 потому что ttl считается с 1, и это сука неудобно
+                    if (typeof hop[ttl - 1] != 'undefined' && ttl == hop[ttl - 1]._attributes.ttl) {
+                        graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
+                        prevNode = hop[ttl - 1]._attributes.ipaddr;
 
-                                // Если тру, нода норм
-                                // -1 потому что ttl считается с 1, и это сука неудобно
-                                if (typeof hop[ttl - 1] != 'undefined' && ttl == hop[ttl - 1]._attributes.ttl) {
-				    graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
-                                    prevNode = hop[ttl - 1]._attributes.ipaddr;
-
-                                } else {
-                                    // Просто математический рандом для анонимных нод, потом нужно будет придумать чтонибудь
-                                    // Now I do it with rtt, seems like we can guess subnets after anon nodes
-				    let tmp = Math.round(hop[ttl - 1]._attributes.rtt);
-				    //let tmp = Math.random();
-				    console.log(tmp);
-                                    graph.addLink(prevNode, tmp);
-                                    prevNode = tmp;
-                                }
-				
-				// Пиним ноду if it has many links
-                                let middle = graph.getNode(prevNode);
-				if (middle.links.length > 5)
-				    layout.pinNode(middle, true);
-                                
-                            }
-                            // Костыль для добавления последней ноды-цели
-                            graph.addLink(prevNode, target_ip);
-                        }
+                    } else {
+                        // Просто математический рандом для анонимных нод, потом нужно будет придумать чтонибудь
+                        // Now I do it with rtt, seems like we can guess subnets after anon nodes
+				        let tmp = Math.round(hop[ttl - 1]._attributes.rtt);
+                        graph.addLink(prevNode, tmp);
+                        prevNode = tmp;
                     }
+				    // Пиним ноду if it has many links
+                    let middle = graph.getNode(prevNode);
+				    if (middle.links.length > 5)
+				        layout.pinNode(middle, true);
+                    } 
+                    // Костыль для добавления последней ноды-цели
+                    graph.addLink(prevNode, target_ip);
                 }
+            }
+        }
 
                 var graph = Viva.Graph.graph();
                 var layout = Viva.Graph.Layout.forceDirected(graph, {
@@ -126,7 +120,7 @@
                       img = Viva.Graph.svg('image')
                          .attr('width', nodeSize)
                          .attr('height', nodeSize)
-                         .link('http://localhost:8080/image');
+                         .link('http://192.168.221.133:8080/image');
 
                     ui.append(svgText);
                     ui.append(img);
@@ -153,7 +147,7 @@
                             else {
 
                                 // testMain(nmapOutputJSON.nmaprun.host);
-                                graph.addNode('127.0.0.1');
+                                //graph.addNode('127.0.0.1');
                                 for (let i = 0; i < nmapOutputJSON.nmaprun.host.length; i++) {
                                     // console.log(nmapOutputJSON.nmaprun.host[i]);
                                     // nmapOutputJSON[i]
