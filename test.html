@@ -31,7 +31,7 @@
                 */
 		
 		function drawHops (host) {
-		    let prevNode = '127.0.0.1';
+            let prevNode = '127.0.0.1';
             if (typeof host.trace == 'undefined') {
                 //let tmpLocalhost = graph.getNode('127.0.0.1');
                	// Here i can change the localhost ip
@@ -73,11 +73,13 @@
                     if (typeof hop[ttl - 1] != 'undefined' && ttl == hop[ttl - 1]._attributes.ttl) {
                         graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
                         prevNode = hop[ttl - 1]._attributes.ipaddr;
-
+                    
                     } else {
                         // Просто математический рандом для анонимных нод, потом нужно будет придумать чтонибудь
                         // Now I do it with rtt, seems like we can guess subnets after anon nodes
-				        let tmp = Math.round(hop[ttl - 1]._attributes.rtt);
+				        //let tmp = hop[ttl - 1]._attributes.rtt; 
+                        //let tmp = Math.round(hop[ttl - 1]._attributes.rtt);
+                        let tmp = Math.random(); 
                         graph.addLink(prevNode, tmp);
                         prevNode = tmp;
                     }
@@ -88,6 +90,10 @@
                     } 
                     // Костыль для добавления последней ноды-цели
                     graph.addLink(prevNode, target_ip);
+
+                    // Добавляем данные для определения ОС
+                    let tmp_targetNode = graph.getNode(target_ip);
+                    tmp_targetNode.data = host.status._attributes.reason_ttl; 
                 }
             }
         }
@@ -114,13 +120,19 @@
                 });
 
                 graphics.node(function(node) {
-                  var ui = Viva.Graph.svg('g'),
+                    let image;
+                    if (node.data < 100)
+                        image = 'linux';
+                    else
+                        image = 'windows';
+
+                    var ui = Viva.Graph.svg('g'),
                     // Create SVG text element with user id as content
                     svgText = Viva.Graph.svg('text').attr('y', '-4px').text(node.id),
                     img = Viva.Graph.svg('image')
-                       .attr('width', nodeSize)
-                       .attr('height', nodeSize)
-                       .link('http://192.168.221.133:8080/image');
+                        .attr('width', nodeSize)
+                        .attr('height', nodeSize)
+                        .link(`http://192.168.221.133:8080/${image}`);
 
                     ui.append(svgText);
                     ui.append(img);
