@@ -101,7 +101,7 @@
                     // layout, that we want to change length of each physical spring
                     // by overriding `springTransform` method:
                     springTransform: function (link, spring) {
-                      spring.length = 300;
+                      spring.length = 100;
                     }
                 });
 
@@ -115,12 +115,12 @@
 
                 graphics.node(function(node) {
                   var ui = Viva.Graph.svg('g'),
-                      // Create SVG text element with user id as content
-                      svgText = Viva.Graph.svg('text').attr('y', '-4px').text(node.id),
-                      img = Viva.Graph.svg('image')
-                         .attr('width', nodeSize)
-                         .attr('height', nodeSize)
-                         .link('http://192.168.221.133:8080/image');
+                    // Create SVG text element with user id as content
+                    svgText = Viva.Graph.svg('text').attr('y', '-4px').text(node.id),
+                    img = Viva.Graph.svg('image')
+                       .attr('width', nodeSize)
+                       .attr('height', nodeSize)
+                       .link('http://192.168.221.133:8080/image');
 
                     ui.append(svgText);
                     ui.append(img);
@@ -146,11 +146,9 @@
                             }
                             else {
 
-                                // testMain(nmapOutputJSON.nmaprun.host);
                                 //graph.addNode('127.0.0.1');
                                 for (let i = 0; i < nmapOutputJSON.nmaprun.host.length; i++) {
                                     // console.log(nmapOutputJSON.nmaprun.host[i]);
-                                    // nmapOutputJSON[i]
                                     let host = nmapOutputJSON.nmaprun.host[i];
                                     drawHops (host);
                                 }
