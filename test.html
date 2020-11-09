@@ -29,22 +29,31 @@
 
                 TODO Решить баг с первинчым линком на графе
                 */
-
+		var prevNode;
                 function drawHops (host) {
-                    console.log(host);
-                    let prevNode = '127.0.0.1';
+                    prevNode = '127.0.0.1';
 
                     if (typeof host.trace == 'undefined') {
-                        let tmpLocalhost = graph.getNode('127.0.0.1');
+                        //let tmpLocalhost = graph.getNode('127.0.0.1');
                     	// Here i can change the localhost ip
-            			tmpLocalhost.nodeId = host.address._attributes.addr;
+            		//	tmpLocalhost.nodeId = host.address._attributes.addr;
                     }
+		    // Exeption for 'alive-but-no-trace' node
+			else if (typeof host.trace.hop == 'undefined') {
+				let tmp = host.address._attributes.addr + 'No trace';
+				graph.addLink(prevNode, tmp);
+			}
                     else {
-                        // console.log(host.trace.hop);
                         if (typeof host.trace.hop.length == 'undefined') {
-                            // console.log('this is 1 hop');
-
-
+                            
+			    
+			    // If true, then this is exection for host with ttl == 2 and there is no array
+			    if (host.trace.hop._attributes.ttl != 1) {
+				// Add anon node, but i just say, this is zero and fuck off
+				let tmp = 'Anon'; 
+				graph.addLink(prevNode, tmp);
+				prevNode = tmp;
+			    }
 
                             graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
 
@@ -70,13 +79,15 @@
 
                                 } else {
                                     // Просто математический рандом для анонимных нод, потом нужно будет придумать чтонибудь
-                                    let tmp = Math.random();
+                                    let tmp = Math.random(); 
                                     graph.addLink(prevNode, tmp);
                                     prevNode = tmp;
                                 }
-                                // Пиним ноду
-                                // let middle = graph.getNode(prevNode);
-                                // layout.pinNode(middle, true);
+				
+				// Пиним ноду if it has many links
+                                let middle = graph.getNode(prevNode);
+				if (middle.links.length > 5)
+				    layout.pinNode(middle, true);
                                 
                             }
                             // Костыль для добавления последней ноды-цели
@@ -87,14 +98,14 @@
 
                 var graph = Viva.Graph.graph();
                 var layout = Viva.Graph.Layout.forceDirected(graph, {
-                    springLength: 700,
-                    springCoeff : 0.00018,
-                    gravity : -4000,
+                    springLength: 3000, // Lines length
+                    springCoeff : 0.0005, // Stregth of lines
+                    gravity : -10, // Push strength between nodes
                     // This is the main part of this example. We are telling force directed
                     // layout, that we want to change length of each physical spring
                     // by overriding `springTransform` method:
                     springTransform: function (link, spring) {
-                      spring.length = 100;
+                      spring.length = 300;
                     }
                 });
 
