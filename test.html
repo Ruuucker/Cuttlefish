@@ -58,6 +58,18 @@
                 // Пиним ноду
                 let middle = graph.getNode(prevNode);
                 layout.pinNode(middle, true);
+
+                // Добавляем данные для определения ОС
+                let target_ip;
+                console.log(host);
+                if (typeof host.address.length == 'undefined')
+                    target_ip = host.address._attributes.addr;
+                else
+                    target_ip = host.address[0]._attributes.addr;
+
+                let tmp_targetNode = graph.getNode(target_ip);
+                tmp_targetNode.data = host.status._attributes.reason_ttl;
+                console.log(tmp_targetNode);
             }
             else {
                             
@@ -87,13 +99,14 @@
                     let middle = graph.getNode(prevNode);
 				    if (middle.links.length > 5)
 				        layout.pinNode(middle, true);
-                    } 
-                    // Костыль для добавления последней ноды-цели
-                    graph.addLink(prevNode, target_ip);
+                    }
 
-                    // Добавляем данные для определения ОС
-                    let tmp_targetNode = graph.getNode(target_ip);
-                    tmp_targetNode.data = host.status._attributes.reason_ttl; 
+                // Костыль для добавления последней ноды-цели
+                graph.addLink(prevNode, target_ip);
+
+                // Добавляем данные для определения ОС
+                let tmp_targetNode = graph.getNode(target_ip);
+                tmp_targetNode.data = host.status._attributes.reason_ttl;
                 }
             }
         }
@@ -121,6 +134,7 @@
 
                 graphics.node(function(node) {
                     let image;
+                    console.log(node);
                     if (node.data < 100)
                         image = 'linux';
                     else
@@ -132,7 +146,8 @@
                     img = Viva.Graph.svg('image')
                         .attr('width', nodeSize)
                         .attr('height', nodeSize)
-                        .link(`http://192.168.221.133:8080/${image}`);
+                        // .link(`http://192.168.221.133:8080/${image}`);
+                        .link(`http://localhost:8080/${image}`);
 
                     ui.append(svgText);
                     ui.append(img);
