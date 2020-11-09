@@ -29,10 +29,9 @@
 
                 TODO Решить баг с первинчым линком на графе
                 */
-		var prevNode;
-                function drawHops (host) {
-                    prevNode = '127.0.0.1';
-
+		var prevNode;// = '127.0.0.1';
+		function drawHops (host) {
+		    prevNode = '127.0.0.1';
                     if (typeof host.trace == 'undefined') {
                         //let tmpLocalhost = graph.getNode('127.0.0.1');
                     	// Here i can change the localhost ip
@@ -74,12 +73,15 @@
                                 // Если тру, нода норм
                                 // -1 потому что ttl считается с 1, и это сука неудобно
                                 if (typeof hop[ttl - 1] != 'undefined' && ttl == hop[ttl - 1]._attributes.ttl) {
-                                    graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
+				    graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
                                     prevNode = hop[ttl - 1]._attributes.ipaddr;
 
                                 } else {
                                     // Просто математический рандом для анонимных нод, потом нужно будет придумать чтонибудь
-                                    let tmp = Math.random(); 
+                                    // Now I do it with rtt, seems like we can guess subnets after anon nodes
+				    let tmp = Math.round(hop[ttl - 1]._attributes.rtt);
+				    //let tmp = Math.random();
+				    console.log(tmp);
                                     graph.addLink(prevNode, tmp);
                                     prevNode = tmp;
                                 }
