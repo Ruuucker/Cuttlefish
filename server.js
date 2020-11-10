@@ -25,6 +25,10 @@ function startServer (jsonPaths) {
     app.get('/windows', (req, res) => {
         res.sendFile('libs/windows.png', {root: __dirname})
     });
+    
+    app.get('/none', (req, res) => {
+        res.sendFile('libs/none.jpg', {root: __dirname})
+    });
 
 	app.get('/test', (req, res) => {
 	    res.send(jsonPaths)

@@ -47,31 +47,24 @@
     			    if (host.trace.hop._attributes.ttl != 1) {
     				// Add anon node, but i just say, this is zero and fuck off
     				let tmp = 'Anon' + prevNode; 
-    			    
+                   
+                    graph.addNode(tmp, {"ttl": 0});
                     // Тут и далее проверки на существования линка делаются для того чтобы не было бага с линком-призраком
                     if (graph.getLink(prevNode, tmp) == null)
                         graph.addLink(prevNode, tmp);
     				prevNode = tmp;
 			    }
 
-                if (graph.getLink(prevNode, host.trace.hop._attributes.ipaddr) == null)
-                    graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
+                // Добавляем данные для определения ОС
+                let tmp_hop = host.trace.hop._attributes.ipaddr;
+                graph.addNode(tmp_hop, {"ttl": host.status._attributes.reason_ttl});
+                
+                if (graph.getLink(prevNode, tmp_hop) == null)
+                    graph.addLink(prevNode, tmp_hop);
 
                 // Пиним ноду
                 let middle = graph.getNode(prevNode);
                 layout.pinNode(middle, true);
-
-                // Добавляем данные для определения ОС
-                let target_ip;
-                //console.log(host);
-                if (typeof host.address.length == 'undefined')
-                    target_ip = host.address._attributes.addr;
-                else
-                    target_ip = host.address[0]._attributes.addr;
-
-                //let tmp_targetNode = graph.getNode(target_ip);
-                //tmp_targetNode.data = host.status._attributes.reason_ttl;
-                //console.log(tmp_targetNode);
             }
             else {
                             
@@ -87,11 +80,14 @@
                     if (typeof hop[ttl - 1] != 'undefined' && ttl == hop[ttl - 1]._attributes.ttl) {
                         
 
+                        // Создаём ноду чтобы в последствии она чекалась на ttl
+                        //let tmp_hop_a = host.trace.hop._attributes.ipaddr;
+                        //graph.addNode(tmp_hop_a, {"ttl": host.status._attributes.reason_ttl});
+                        // Конкретно вот тут может и не нужно, потому как это будет повтор, определение target_ip должен сработать для всех
+
                         // Чек на существование линка и ноды, если их пересоздавать то будет баг
-                        if (graph.getLink(prevNode, hop[ttl - 1]._attributes.ipaddr) == null) {
-                            console.log('draw', prevNode, 'to', hop[ttl - 1]._attributes.ipaddr);
+                        if (graph.getLink(prevNode, hop[ttl - 1]._attributes.ipaddr) == null)
                             graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
-                        }
                         prevNode = hop[ttl - 1]._attributes.ipaddr;
                     
                     } else {
@@ -107,16 +103,15 @@
                     }
 				    // Пиним ноду if it has many links
                     let middle = graph.getNode(prevNode);
-				    if (middle.links.length > 5)
+				    if (middle.links.length > 3)
 				        layout.pinNode(middle, true);
                     }
 
+                // Добавляем данные для определения ОС
+                graph.addNode(target_ip, {"ttl": host.status._attributes.reason_ttl});
+
                 // Костыль для добавления последней ноды-цели
                 graph.addLink(prevNode, target_ip);
-
-                // Добавляем данные для определения ОС
-                //let tmp_targetNode = graph.getNode(target_ip);
-                //tmp_targetNode.data = host.status._attributes.reason_ttl;
                 }
             }
         }
@@ -131,7 +126,7 @@
                     // layout, that we want to change length of each physical spring
                     // by overriding `springTransform` method:
                     springTransform: function (link, spring) {
-                      spring.length = 100;
+                      spring.length = 170;
                     }
                 });
 
@@ -145,11 +140,18 @@
 
                 graphics.node(function(node) {
                     let image;
-                    //console.log(node);
-                    if (node.data < 100)
-                        image = 'linux';
-                    else
-                        image = 'windows';
+
+                    if (typeof node.data != 'undefined') {
+                        //console.log(node.data.ttl);
+                        // Возможно стоить сделать им точный сравнения? aka == 64 == 127
+                        if (node.data.ttl < 64 && node.data.ttl > 50)
+                            image = 'linux';
+                        if (node.data.ttl < 127 && node.data.ttl > 100) 
+                            image = 'windows';
+                    }
+                    if (typeof image == 'undefined') 
+                        image = 'none';
+
 
                     var ui = Viva.Graph.svg('g'),
                     // Create SVG text element with user id as content
