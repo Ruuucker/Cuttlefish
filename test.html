@@ -26,8 +26,6 @@
                 Тут довольно ужасный код, но он принес мне немного боли поэтому пока что оставлю так
                 Возможно перейду на
                 https://gojs.net/latest/index.html
-
-                TODO Решить баг с первинчым линком на графе
                 */
 		
 		function drawHops (host) {
@@ -48,12 +46,16 @@
     			    // If true, then this is exection for host with ttl == 2 and there is no array
     			    if (host.trace.hop._attributes.ttl != 1) {
     				// Add anon node, but i just say, this is zero and fuck off
-    				let tmp = 'Anon'; 
-    				graph.addLink(prevNode, tmp);
+    				let tmp = 'Anon' + prevNode; 
+    			    
+                    // Тут и далее проверки на существования линка делаются для того чтобы не было бага с линком-призраком
+                    if (graph.getLink(prevNode, tmp) == null)
+                        graph.addLink(prevNode, tmp);
     				prevNode = tmp;
 			    }
 
-                graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
+                if (graph.getLink(prevNode, host.trace.hop._attributes.ipaddr) == null)
+                    graph.addLink(prevNode, host.trace.hop._attributes.ipaddr);
 
                 // Пиним ноду
                 let middle = graph.getNode(prevNode);
@@ -61,15 +63,15 @@
 
                 // Добавляем данные для определения ОС
                 let target_ip;
-                console.log(host);
+                //console.log(host);
                 if (typeof host.address.length == 'undefined')
                     target_ip = host.address._attributes.addr;
                 else
                     target_ip = host.address[0]._attributes.addr;
 
-                let tmp_targetNode = graph.getNode(target_ip);
-                tmp_targetNode.data = host.status._attributes.reason_ttl;
-                console.log(tmp_targetNode);
+                //let tmp_targetNode = graph.getNode(target_ip);
+                //tmp_targetNode.data = host.status._attributes.reason_ttl;
+                //console.log(tmp_targetNode);
             }
             else {
                             
@@ -83,7 +85,13 @@
                     // Если тру, нода норм
                     // -1 потому что ttl считается с 1, и это сука неудобно
                     if (typeof hop[ttl - 1] != 'undefined' && ttl == hop[ttl - 1]._attributes.ttl) {
-                        graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
+                        
+
+                        // Чек на существование линка и ноды, если их пересоздавать то будет баг
+                        if (graph.getLink(prevNode, hop[ttl - 1]._attributes.ipaddr) == null) {
+                            console.log('draw', prevNode, 'to', hop[ttl - 1]._attributes.ipaddr);
+                            graph.addLink(prevNode, hop[ttl - 1]._attributes.ipaddr);
+                        }
                         prevNode = hop[ttl - 1]._attributes.ipaddr;
                     
                     } else {
@@ -91,8 +99,10 @@
                         // Now I do it with rtt, seems like we can guess subnets after anon nodes
 				        //let tmp = hop[ttl - 1]._attributes.rtt; 
                         //let tmp = Math.round(hop[ttl - 1]._attributes.rtt);
-                        let tmp = Math.random(); 
-                        graph.addLink(prevNode, tmp);
+                        //let tmp = Math.random(); 
+                        let tmp = 'Anon' + prevNode;
+                        if (graph.getLink(prevNode, tmp) == null)
+                            graph.addLink(prevNode, tmp);
                         prevNode = tmp;
                     }
 				    // Пиним ноду if it has many links
@@ -105,17 +115,18 @@
                 graph.addLink(prevNode, target_ip);
 
                 // Добавляем данные для определения ОС
-                let tmp_targetNode = graph.getNode(target_ip);
-                tmp_targetNode.data = host.status._attributes.reason_ttl;
+                //let tmp_targetNode = graph.getNode(target_ip);
+                //tmp_targetNode.data = host.status._attributes.reason_ttl;
                 }
             }
         }
 
                 var graph = Viva.Graph.graph();
                 var layout = Viva.Graph.Layout.forceDirected(graph, {
-                    springLength: 3000, // Lines length
+                    springLength: 1000, // Lines length
                     springCoeff : 0.0005, // Stregth of lines
-                    gravity : -10, // Push strength between nodes
+                    gravity : -1, // Push strength between nodes
+                    dragCoeff : 0.02,
                     // This is the main part of this example. We are telling force directed
                     // layout, that we want to change length of each physical spring
                     // by overriding `springTransform` method:
@@ -134,7 +145,7 @@
 
                 graphics.node(function(node) {
                     let image;
-                    console.log(node);
+                    //console.log(node);
                     if (node.data < 100)
                         image = 'linux';
                     else
@@ -146,8 +157,8 @@
                     img = Viva.Graph.svg('image')
                         .attr('width', nodeSize)
                         .attr('height', nodeSize)
-                        // .link(`http://192.168.221.133:8080/${image}`);
-                        .link(`http://localhost:8080/${image}`);
+                        .link(`http://192.168.221.133:8080/${image}`);
+                        //.link(`http://localhost:8080/${image}`);
 
                     ui.append(svgText);
                     ui.append(img);
@@ -182,9 +193,8 @@
                             }
                         }, arrayOfJSON[ni]);
                     }
-
                 }, '/test');
-
+                
                 renderer.run();
             }
 
