@@ -143,10 +143,10 @@
 
                     if (typeof node.data != 'undefined') {
                         //console.log(node.data.ttl);
-                        // Возможно стоить сделать им точный сравнения? aka == 64 == 127
-                        if (node.data.ttl < 64 && node.data.ttl > 50)
+			// Возможно стоить сделать им точный сравнения? aka == 64 == 127
+                        if (node.data.ttl < 65 && node.data.ttl > 50)
                             image = 'linux';
-                        if (node.data.ttl < 127 && node.data.ttl > 100) 
+                        if (node.data.ttl < 128 && node.data.ttl > 100) 
                             image = 'windows';
                     }
                     if (typeof image == 'undefined') 
@@ -159,8 +159,8 @@
                     img = Viva.Graph.svg('image')
                         .attr('width', nodeSize)
                         .attr('height', nodeSize)
-                        .link(`http://192.168.221.133:8080/${image}`);
-                        //.link(`http://localhost:8080/${image}`);
+                        //.link(`http://192.168.221.133:8080/${image}`);
+                        .link(`http://localhost:8080/${image}`);
 
                     ui.append(svgText);
                     ui.append(img);
