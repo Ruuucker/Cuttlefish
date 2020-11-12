@@ -3,12 +3,6 @@
 const xmlConvert = require('xml-js');
 const fs = require('fs');
 
-function convertIpIntoSubnet (ip) {
-	let tmpIp = ip.slice(0, ip.lastIndexOf('.') + 1);
-	tmpIp = tmpIp + '0/24';
-	return tmpIp;
-}
-
 function convertNmapOutput (dirToSave, xmlPath, fileName) {
 	// Импорт и преобразование
 	let nmapOutputXml = fs.readFileSync(xmlPath, {encoding:'utf8', flag:'r'});
@@ -36,6 +30,5 @@ function getRandomInt(min, max) {
 
 module.exports = {
 	generateFileName: generateFileName,
-	convertNmapOutput: convertNmapOutput,
-	convertIpIntoSubnet: convertIpIntoSubnet
+	convertNmapOutput: convertNmapOutput
 }

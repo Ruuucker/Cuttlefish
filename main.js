@@ -1,14 +1,28 @@
 "use strict";
 
-const { generateFileName, convertNmapOutput, convertIpIntoSubnet } = require('./utils.js');
+const { generateFileName, convertNmapOutput} = require('./utils.js');
 const { startScan, checkIP } = require('./scan.js');
 const { startServer } = require('./server.js');
 
 var dirToSave = '/tmp/';
-var diaps = [];
+
+// Посмотрю какие IP точно должны существовать в этих конкретных подсетках
+// Коли таких нет - сканирую всё ИЛИ беру диапазоны из трейсроутов к 8.8.8.8, неизвестным IP и такие вот вещи
+
+/*      Диапазоны внутренних IP от RFC 1918
+ *
+ *      10.0.0.0        -   10.255.255.255  (10/8 prefix)
+ *      172.16.0.0      -   172.31.255.255  (172.16/12 prefix)
+ *      192.168.0.0     -   192.168.255.255 (192.168/16 prefix)
+ *
+ */
+
+// Ссылки которые мне нужно проверить для быстрого скана
+// https://stackoverflow.com/questions/14038606/fastest-way-to-ping-a-network-range-and-return-responsive-hosts
+// https://serverfault.com/questions/665311/fastest-way-to-scan-all-hosts-that-are-online
 
 // Здесь будут ip которые должы быть доступны если есть такой диапазон, тоесть 192.168.1.1, 192.168.0.254, что то такое, еще паработаю над состовлением списка
-var ipSubnets = ['172.31.31.11', '192.168.1.1', '192.168.0.254', '192.168.221.254'];
+var internalSubnets = ['172.31.31.0/24', '192.168.1.0/24', '192.168.221.0/24'];
 
 // Check if we have internet connetion
 checkIP('8.8.8.8').then((tmpInfo) => {
@@ -20,39 +34,20 @@ checkIP('8.8.8.8').then((tmpInfo) => {
 // ### Subnet checks ###
 // #####################
 
-var checkPromises = [];
-for (var addrIndex = ipSubnets.length - 1; addrIndex >= 0; addrIndex--) {
-	checkPromises.push(checkIP(ipSubnets[addrIndex]));
+var scansPromises = [];
+for (let i = internalSubnets.length - 1; i >= 0; i--) {
+    let fileName = generateFileName();
+        scansPromises.push(startScan(internalSubnets[i], dirToSave, fileName));
 }
 
-Promise.all(checkPromises).then((allIsHostUpInfo) => {
-	for (let i = allIsHostUpInfo.length - 1; i >= 0; i--) {
-		// Resolve cannot process 2 varibables per time (or I just dont know how to do it) so I return massive
-		// allIsHostUpInfo[0] - ip addres, allIsHostUpInfo[1] - is host up
-		let ipAddr = allIsHostUpInfo[i][0];
-		let isHostUp = allIsHostUpInfo[i][1];
+Promise.all(scansPromises).then((xmlPaths) => {
+    // console.log(xmlPaths);
 
-		console.log(ipAddr, isHostUp);
-		if (isHostUp)
-			diaps.push(convertIpIntoSubnet(ipAddr));
-	}
+    let jsonPaths = [];
 
-	// Пока что оставлю эту штуку здесь, в дальнейшем её можно вызывать из функции, для удобства и красоты
-	var scansPromises = [];
-	for (let i = diaps.length - 1; i >= 0; i--) {
-		let fileName = generateFileName();
-		scansPromises.push(startScan(diaps[i], dirToSave, fileName));
-	}
-
-	Promise.all(scansPromises).then((xmlPaths) => {
-		// console.log(xmlPaths);
-
-		let jsonPaths = [];
-
-		for (let i = xmlPaths.length - 1; i >= 0; i--) {
-			let fileName = generateFileName();
-			jsonPaths.push(convertNmapOutput(dirToSave, xmlPaths[i], fileName));
-		}
-		startServer(jsonPaths);
-	});
+    for (let i = xmlPaths.length - 1; i >= 0; i--) {
+        let fileName = generateFileName();
+	    jsonPaths.push(convertNmapOutput(dirToSave, xmlPaths[i], fileName));
+    }
+    startServer(jsonPaths);
 });
