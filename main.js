@@ -20,9 +20,9 @@ var dirToSave = '/tmp/';
 // Ссылки которые мне нужно проверить для быстрого скана
 // https://stackoverflow.com/questions/14038606/fastest-way-to-ping-a-network-range-and-return-responsive-hosts
 // https://serverfault.com/questions/665311/fastest-way-to-scan-all-hosts-that-are-online
+// Экспериментальным путём было выяснено что подобный формат комманды: sudo nmap -sn -T5 --min-parallelism 100 --max-parallelism 256 192.168.0.0/24 самый быстрый
 
-// Здесь будут ip которые должы быть доступны если есть такой диапазон, тоесть 192.168.1.1, 192.168.0.254, что то такое, еще паработаю над состовлением списка
-var internalSubnets = ['172.31.31.0/24', '192.168.1.0/24', '192.168.221.0/24'];
+var internalSubnets = ['172.16.0.0/24', '192.168.0.0/16', '10.0.0.0/8'];
 
 // Check if we have internet connetion
 checkIP('8.8.8.8').then((tmpInfo) => {
@@ -30,9 +30,12 @@ checkIP('8.8.8.8').then((tmpInfo) => {
 		console.log('We have internet connetion!');
 });
 
-// #####################
-// ### Subnet checks ###
-// #####################
+/* #####################
+*  #####################
+*  ### Subnet checks ###
+*  #####################
+*  #####################
+*/
 
 var scansPromises = [];
 for (let i = internalSubnets.length - 1; i >= 0; i--) {
