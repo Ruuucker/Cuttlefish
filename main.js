@@ -56,7 +56,7 @@ broadcast-bjnp-discover.nse
 broadcast-db2-discover.nse
 broadcast-dhcp6-discover.nse
 broadcast-dhcp-discover.nse
-broadcast-dns-service-discovery.nse
+broadcast-dns-service-discovery.nse -- mdns
 broadcast-dropbox-listener.nse
 broadcast-eigrp-discovery.nse
 broadcast-hid-discoveryd.nse
@@ -67,8 +67,8 @@ broadcast-netbios-master-browser.nse
 broadcast-networker-discover.nse
 broadcast-novell-locate.nse
 broadcast-ospf2-discover.nse
-broadcast-pc-anywhere.nse
-broadcast-pc-duo.nse
+broadcast-pc-anywhere.nse -- эти двое просто отсылают udp пакет на 255.255.255.255,
+broadcast-pc-duo.nse -- может не нужна эта хуйня?
 broadcast-pim-discovery.nse
 broadcast-ping.nse
 broadcast-pppoe-discover.nse
@@ -89,6 +89,23 @@ broadcast-xdmcp-discover.nse
     2) Общий функционал примерно такой: пинговать (с угаыванием ОС), проверять 8.8.8.8, собирать подсетки и затем их пинговать, собирать мак адреса и запускать броадкаст скрипты nmap
     3) Добавить возможность импортировать nmap xml файл, и желательно еще сделать портабл версию для загрузки её в любое устройство, создание xml файлика и отрисовки на пк с обычной версией
     4) В идеале еще добавить удаленный arp скан через snmp
+
+     Нужно написать сканер для llmnr (на nbns можно, продолжаю исследования) https://tools.ietf.org/html/rfc4795
+     Примерный пакет
+     Link-local Multicast Name Resolution (query)
+        Transaction ID: 0xb156
+        Flags: 0x0000 Standard query
+        Questions: 1
+        Answer RRs: 0
+        Authority RRs: 0
+        Additional RRs: 0
+        Queries
+            STWKS059: type ANY, class IN
+                Name: STWKS059
+                [Name Length: 8]
+                [Label Count: 1]
+                Type: * (A request for all records the server/cache has available) (255)
+                Class: IN (0x0001)
 
 */
 
