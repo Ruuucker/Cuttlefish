@@ -50,6 +50,46 @@ var dirToSave = '/tmp/';
         2) IP полученные от трейсроута до 8.8.8.8 и в принципе от трейсроутов
         3) На крайний случай просто пропинговать большие диапазоны 
 
+    Сбор данных от мультикастов реализованных в nmap:
+broadcast-ataoe-discover.nse
+broadcast-bjnp-discover.nse
+broadcast-db2-discover.nse
+broadcast-dhcp6-discover.nse
+broadcast-dhcp-discover.nse
+broadcast-dns-service-discovery.nse
+broadcast-dropbox-listener.nse
+broadcast-eigrp-discovery.nse
+broadcast-hid-discoveryd.nse
+broadcast-igmp-discovery.nse
+broadcast-jenkins-discover.nse
+broadcast-listener.nse -- работает как пассивный, не подходит по идеологии
+broadcast-netbios-master-browser.nse
+broadcast-networker-discover.nse
+broadcast-novell-locate.nse
+broadcast-ospf2-discover.nse
+broadcast-pc-anywhere.nse
+broadcast-pc-duo.nse
+broadcast-pim-discovery.nse
+broadcast-ping.nse
+broadcast-pppoe-discover.nse
+broadcast-rip-discover.nse
+broadcast-ripng-discover.nse
+broadcast-sonicwall-discover.nse
+broadcast-sybase-asa-discover.nse
+broadcast-tellstick-discover.nse
+broadcast-upnp-info.nse
+broadcast-versant-locate.nse
+broadcast-wake-on-lan.nse
+broadcast-wpad-discover.nse
+broadcast-wsdd-discover.nse
+broadcast-xdmcp-discover.nse
+
+Общее TODO:
+    1) Сделать 2 режима, легкий и классический, которые будут различаться по времени действия
+    2) Общий функционал примерно такой: пинговать (с угаыванием ОС), проверять 8.8.8.8, собирать подсетки и затем их пинговать, собирать мак адреса и запускать броадкаст скрипты nmap
+    3) Добавить возможность импортировать nmap xml файл, и желательно еще сделать портабл версию для загрузки её в любое устройство, создание xml файлика и отрисовки на пк с обычной версией
+
+
 */
 
 // Ссылки которые мне нужно проверить для быстрого скана
