@@ -6,13 +6,11 @@ function startScript (scriptName, dirToSave, fileName) {
 
 	return new Promise ((resolve, reject) => {
 		let wholePath = dirToSave + fileName + '.xml';
-		exec(`sudo nmap -T5 --min-parallelism 100 --max-parallelism 256 --script ${scriptName} -oX ${wholePath}`, (error, stdout, stderr) => {
-			
+		exec(`sudo nmap -T5 --min-parallelism 100 --max-parallelism 256 --script ${scriptName} -oX ${wholePath}`, (error, stdout, stderr) => {	
             if (error) {
 				console.error(`exec error: ${error}`);
 				return;
 			}
-
             // Just for logs
 			// console.log(`stdout: ${stdout}`);
 			resolve (wholePath);
@@ -21,8 +19,9 @@ function startScript (scriptName, dirToSave, fileName) {
 }
 
 function scriptParse(addr) {
-        return new Promise ((resolve, reject) => {
-            exec(`sudo nmap -sn ${addr}`, (error, stdout, stderr) => {
+
+    return new Promise ((resolve, reject) => {
+        exec(`sudo nmap -sn ${addr}`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error}`);
                 return;

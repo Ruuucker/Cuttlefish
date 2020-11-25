@@ -1,8 +1,8 @@
 "use strict";
 
 const { generateFileName, convertNmapOutput, convertIpIntoSubnet } = require('./utils.js');
-const { traceScan, checkIP, getFirstIPs } = require('./scan/broadScan.js');
-const { startScript, scriptParse } = require('./scan/traceScan.js');
+const { traceScan, checkIP, getFirstIPs } = require('./scan/traceScan.js');
+const { startScript, scriptParse } = require('./scan/broadcastScan.js');
 const { startServer } = require('./server.js');
 
 var dirToSave = '/tmp/';
@@ -139,15 +139,19 @@ checkIP('8.8.8.8').then((tmpInfo) => {
 */
 
 // Нужно будет пару раз посканить, чтобы наверняка, и менять протокол трейсровки
-getFirstIPs(dirToSave, generateFileName()).then((ips) => {
+// getFirstIPs(dirToSave, generateFileName()).then((ips) => {
 
-    for (let i = 0; i < ips.length; i++)
-        internalSubnets.push(convertIpIntoSubnet(ips[i]));
+//     for (let i = 0; i < ips.length; i++)
+//         internalSubnets.push(convertIpIntoSubnet(ips[i]));
     
-    console.log(internalSubnets)
+//     console.log(internalSubnets)
+// });
+
+startScript('broadcast-*', dirToSave, generateFileName()).then((xmlPath) => {
+    let tmpAr = convertNmapOutput(dirToSave, xmlPath, generateFileName());
+    let json = JSON.parse(tmpAr[1]);
+    console.log(json.nmaprun.prescript.script.table);
 });
-
-
 
 /*
 console.log(process.argv, process.exit());

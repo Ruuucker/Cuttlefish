@@ -27,9 +27,11 @@ function checkIP (addr) {
                 console.error(`exec error: ${error}`);
                 return;
             }
+    
             let tmpString = stdout.slice(stdout.lastIndexOf('('), stdout.lastIndexOf(')'));
             let isHostUp = tmpString.includes('1');
             let infoTmp = [addr, isHostUp];
+    
             // Resolve cannot process 2 varibables per time (or I just dont know how to do it) so I return massive
             resolve (infoTmp);
         });
@@ -37,6 +39,7 @@ function checkIP (addr) {
 }
 
 function getFirstIPs (dirToSave, fileName) {
+
     return new Promise ((resolve, reject) => {
         traceScan('8.8.8.8', dirToSave, fileName).then((xmlPath) => {
             let tmpAr = convertNmapOutput(dirToSave, xmlPath, fileName);
