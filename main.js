@@ -1,7 +1,8 @@
 "use strict";
 
 const { generateFileName, convertNmapOutput, convertIpIntoSubnet } = require('./utils.js');
-const { traceScan, checkIP, getFirstIPs } = require('./scan/traceScan.js');
+const { traceScan, checkIP, getFirstIPs } = require('./scan/broadScan.js');
+const { startScript, scriptParse } = require('./scan/traceScan.js');
 const { startServer } = require('./server.js');
 
 var dirToSave = '/tmp/';
@@ -138,12 +139,18 @@ checkIP('8.8.8.8').then((tmpInfo) => {
 */
 
 // Нужно будет пару раз посканить, чтобы наверняка, и менять протокол трейсровки
-getFirstIPs().then((ips) => {
-    console.log(ips); 
+getFirstIPs(dirToSave, generateFileName()).then((ips) => {
+
+    for (let i = 0; i < ips.length; i++)
+        internalSubnets.push(convertIpIntoSubnet(ips[i]));
+    
+    console.log(internalSubnets)
 });
 
+
+
 /*
-console.log(process.argv, process.getuid());
+console.log(process.argv, process.exit());
 process.exit();
 
 var scansPromises = [];

@@ -1,7 +1,7 @@
 "use strict";
 
 const { exec } = require('child_process');
-const { generateFileName, convertNmapOutput, convertIpIntoSubnet } = require('../utils.js');
+const { convertNmapOutput } = require('../utils.js');
 
 function traceScan (addr, dirToSave, fileName) {
 
@@ -36,10 +36,8 @@ function checkIP (addr) {
     }); 
 }
 
-function getFirstIPs () {
+function getFirstIPs (dirToSave, fileName) {
     return new Promise ((resolve, reject) => {
-        let dirToSave = '/tmp/';
-        let fileName = generateFileName();
         traceScan('8.8.8.8', dirToSave, fileName).then((xmlPath) => {
             let tmpAr = convertNmapOutput(dirToSave, xmlPath, fileName);
             let json = JSON.parse(tmpAr[1]);
