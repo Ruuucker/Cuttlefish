@@ -12,7 +12,7 @@ function convertNmapOutput (dirToSave, xmlPath, fileName) {
 	let wholePath = dirToSave + fileName + '.json';
 	fs.writeFileSync(wholePath, nmapOutputJSON);
 	// nmapOutputJSON = JSON.parse(nmapOutputJSON);
-	return wholePath;
+	return [wholePath, nmapOutputJSON];
 }
 
 function generateFileName () {
@@ -28,7 +28,14 @@ function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
+function convertIpIntoSubnet (ip) {
+	let tmpIp = ip.slice(0, ip.lastIndexOf('.') + 1);
+	tmpIp = tmpIp + '0/24';
+	return tmpIp;
+}
+
 module.exports = {
 	generateFileName: generateFileName,
-	convertNmapOutput: convertNmapOutput
+    convertNmapOutput: convertNmapOutput,
+    convertIpIntoSubnet: convertIpIntoSubnet
 }

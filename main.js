@@ -1,12 +1,10 @@
 "use strict";
 
-const { generateFileName, convertNmapOutput} = require('./utils.js');
-const { startScan, checkIP } = require('./scan.js');
+const { generateFileName, convertNmapOutput, convertIpIntoSubnet } = require('./utils.js');
+const { traceScan, checkIP, getFirstIPs } = require('./scan/traceScan.js');
 const { startServer } = require('./server.js');
 
 var dirToSave = '/tmp/';
-
-// Коли таких нет - сканирую всё ИЛИ беру диапазоны из трейсроутов к 8.8.8.8, неизвестным IP и такие вот вещи
 
 /*      Диапазоны внутренних IP от RFC 1918
  *
@@ -107,6 +105,11 @@ broadcast-xdmcp-discover.nse
                 Type: * (A request for all records the server/cache has available) (255)
                 Class: IN (0x0001)
 
+Примерный алгоритм работы:
+    Фаза 1 - сбор всей информации сразу (трейсроут до 8.8.8.8 и пинги по всем подсеткам, арп, скрипты)
+    Фаза 2 - загрузка IP из скриптов в трейсроут и по новой пинг подсеток
+    Фаза 3 - сканирование портов на предмет snmp, net-bios и еще чего-нибудь легкого и интересного (опционально на самом деле, но будет очень кстати)
+    Фаза 4 - отрисовка
 */
 
 // Ссылки которые мне нужно проверить для быстрого скана
@@ -114,7 +117,11 @@ broadcast-xdmcp-discover.nse
 // https://serverfault.com/questions/665311/fastest-way-to-scan-all-hosts-that-are-online
 // Экспериментальным путём было выяснено что подобный формат комманды: sudo nmap -sn -T5 --min-parallelism 100 --max-parallelism 256 192.168.0.0/24 самый быстрый
 
-var internalSubnets = ['172.16.0.0/24', '192.168.0.0/16', '10.0.0.0/8'];
+
+
+
+
+var internalSubnets = [];
 
 // Check if we have internet connetion
 checkIP('8.8.8.8').then((tmpInfo) => {
@@ -122,17 +129,27 @@ checkIP('8.8.8.8').then((tmpInfo) => {
 		console.log('We have internet connetion!');
 });
 
-/* #####################
+/*
+*  #####################
 *  #####################
 *  ### Subnet checks ###
 *  #####################
 *  #####################
 */
 
+// Нужно будет пару раз посканить, чтобы наверняка, и менять протокол трейсровки
+getFirstIPs().then((ips) => {
+    console.log(ips); 
+});
+
+/*
+console.log(process.argv, process.getuid());
+process.exit();
+
 var scansPromises = [];
 for (let i = internalSubnets.length - 1; i >= 0; i--) {
     let fileName = generateFileName();
-        scansPromises.push(startScan(internalSubnets[i], dirToSave, fileName));
+        scansPromises.push(traceScan(internalSubnets[i], dirToSave, fileName));
 }
 
 Promise.all(scansPromises).then((xmlPaths) => {
@@ -145,4 +162,4 @@ Promise.all(scansPromises).then((xmlPaths) => {
 	    jsonPaths.push(convertNmapOutput(dirToSave, xmlPaths[i], fileName));
     }
     startServer(jsonPaths);
-});
+}); */
