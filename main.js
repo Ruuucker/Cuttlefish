@@ -50,25 +50,25 @@ var dirToSave = '/tmp/';
         3) На крайний случай просто пропинговать большие диапазоны 
 
     Сбор данных от мультикастов реализованных в nmap:
-broadcast-ataoe-discover.nse
-broadcast-bjnp-discover.nse
-broadcast-db2-discover.nse
-broadcast-dhcp6-discover.nse
-broadcast-dhcp-discover.nse
-broadcast-dns-service-discovery.nse -- mdns
-broadcast-dropbox-listener.nse
-broadcast-eigrp-discovery.nse
-broadcast-hid-discoveryd.nse
-broadcast-igmp-discovery.nse
-broadcast-jenkins-discover.nse
-broadcast-listener.nse -- работает как пассивный, не подходит по идеологии
-broadcast-netbios-master-browser.nse
-broadcast-networker-discover.nse
-broadcast-novell-locate.nse
-broadcast-ospf2-discover.nse
+broadcast-ataoe-discover.nse +- работает только если указать интерфейс, нужно поподробнее прочесть об этой технике и нужно ли её вообще применять
+broadcast-bjnp-discover.nse +
+broadcast-db2-discover.nse +
+broadcast-dhcp6-discover.nse +
+broadcast-dhcp-discover.nse +
+broadcast-dns-service-discovery.nse -- mdns +
+broadcast-dropbox-listener.nse +- полезная штука, но очень ситуативная из за дроп бокса и тот факт что это листенер, больше минус чем плюс в нашей ситуации
+broadcast-eigrp-discovery.nse + по идее штука хорошая, шлёт мультикаст для циски, но на моём опыте нихуя он не шлёт, может запускаю не так?
+broadcast-hid-discoveryd.nse +
+broadcast-igmp-discovery.nse +
+broadcast-jenkins-discover.nse +
+broadcast-listener.nse -- работает как пассивный, не подходит по идеологии, но на самом деле вполне годный
+broadcast-netbios-master-browser.nse +
+broadcast-networker-discover.nse + вполне норм
+broadcast-novell-locate.nse +
+broadcast-ospf2-discover.nse не увидел что он отсылает, но пока что +
 broadcast-pc-anywhere.nse -- эти двое просто отсылают udp пакет на 255.255.255.255,
-broadcast-pc-duo.nse -- может не нужна эта хуйня?
-broadcast-pim-discovery.nse
+broadcast-pc-duo.nse -- может не нужна эта хуйня? а оставлю на всякий, этот вот +
+broadcast-pim-discovery.nse запущу все сразу на работе, посмотрим что будет
 broadcast-ping.nse
 broadcast-pppoe-discover.nse
 broadcast-rip-discover.nse
