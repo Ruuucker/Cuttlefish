@@ -32,14 +32,11 @@ function scriptParseIP(array) {
         arrForCheck.forEach(value => { 
             value = value.match(/[0-9][0-9][0-9]\.[0-9][0-9][0-9]\.[0-9][0-9][0-9]\.[0-9][0-9][0-9]/gi);
            
-            if (value != null) {
-                value = value[0].replace(/\D\./gi, '');
-                returnArr.push(value); 
-            }
+            if (value != null)
+                returnArr.push(value[0].replace(/\D\./gi, '')); 
         });
         
         console.log(returnArr);
-        console.log('end of iterarion');
         //clearIPsArray = clearIPsArray.concat(returnArr);
     }
 

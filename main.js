@@ -163,6 +163,13 @@ startScript(arr, dirToSave, generateFileName()).then((resolveArr) => {
 
     // Из этой функции должны вылетать IP
     console.log(scriptParseIP(json.nmaprun.prescript.script));
+
+    /*
+        Ну и это всё должно быть как то так
+                
+        let IPs = scriptParseIP(json.nmaprun.prescript.script);
+    */
+
 });
 
 /*
