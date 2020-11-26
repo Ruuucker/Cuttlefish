@@ -2,7 +2,7 @@
 
 const { generateFileName, convertNmapOutput, convertIpIntoSubnet } = require('./utils.js');
 const { traceScan, checkIP, getFirstIPs } = require('./scan/traceScan.js');
-const { startScript, scriptParse } = require('./scan/broadcastScan.js');
+const { startScript, scriptParseIP } = require('./scan/broadcastScan.js');
 const { startServer } = require('./server.js');
 
 var dirToSave = '/tmp/';
@@ -127,7 +127,7 @@ var internalSubnets = [];
 // Check if we have internet connetion
 checkIP('8.8.8.8').then((tmpInfo) => {
 	if (tmpInfo[1])
-		console.log('We have internet connetion!');
+		console.log('We have internet connection!');
 });
 
 /*
@@ -147,10 +147,22 @@ checkIP('8.8.8.8').then((tmpInfo) => {
 //     console.log(internalSubnets)
 // });
 
-startScript('broadcast-*', dirToSave, generateFileName()).then((xmlPath) => {
+var arr = [ 'broadcast-ataoe-discover', 'broadcast-bjnp-discover', 'broadcast-db2-discover', 'broadcast-dhcp6-discover', 'broadcast-dhcp-discover', 'broadcast-dns-service-discovery', 'broadcast-dropbox-listener', 'broadcast-eigrp-discovery', 'broadcast-hid-discoveryd', 'broadcast-igmp-discovery', 'broadcast-jenkins-discover', 'broadcast-listener', 'broadcast-netbios-master-browser', 'broadcast-networker-discover', 'broadcast-novell-locate', 'broadcast-ospf2-discover', 'broadcast-pc-anywhere', 'broadcast-pc-duo', 'broadcast-pim-discovery', 'broadcast-ping', 'broadcast-pppoe-discover', 'broadcast-rip-discover', 'broadcast-ripng-discover.nse', 'broadcast-sonicwall-discover.nse', 'broadcast-sybase-asa-discover.nse', 'broadcast-tellstick-discover.nse', 'broadcast-upnp-info.nse', 'broadcast-versant-locate.nse', 'broadcast-wake-on-lan.nse', 'broadcast-wpad-discover.nse', 'broadcast-wsdd-discover.nse', 'broadcast-xdmcp-discover.nse' ];
+
+// TODO Нужно добавить выбор интерфейса
+
+startScript(arr, dirToSave, generateFileName()).then((resolveArr) => {
+    let xmlPath = resolveArr[0];
+    let nmapStdout = resolveArr[1];
+
     let tmpAr = convertNmapOutput(dirToSave, xmlPath, generateFileName());
     let json = JSON.parse(tmpAr[1]);
-    console.log(json.nmaprun.prescript.script.table);
+    
+    // Вывод результата nmap на экран, потом может быть мы будет куда то его записывать или что-то в этом роде
+    console.log(nmapStdout);
+
+    // Из этой функции должны вылетать IP
+    console.log(scriptParseIP(json.nmaprun.prescript.script));
 });
 
 /*
