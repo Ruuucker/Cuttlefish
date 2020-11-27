@@ -25,34 +25,23 @@ function scriptParseIP(array) {
     let clearIPsArray = [];
 
     for (let i = 0; i < array.length; i++) {
-        let arrForCheck = array[i]._attributes.output.split(' ');
+        let dataString = array[i]._attributes.output; 
         let returnArr = [];
-
-        // Пошло всё в жопу, пока что оставлю это так
-        arrForCheck.forEach(value => { 
-            value = value.match(/[0-9][0-9][0-9]\.[0-9][0-9][0-9]\.[0-9][0-9][0-9]\.[0-9][0-9][0-9]/gi);
-           
-            if (value != null)
-                returnArr.push(value[0].replace(/\D\./gi, '')); 
-        });
+        dataString = dataString.match(/[0-9][0-9]*[0-9]*\.[0-9][0-9]*[0-9]*\.[0-9][0-9]*[0-9]*\.[0-9][0-9]*[0-9]*/gim);
         
-        console.log(returnArr);
-        //clearIPsArray = clearIPsArray.concat(returnArr);
+        if (dataString != null) {
+            dataString.forEach(value => {
+                if (!value.includes('255'))
+                    returnArr.push(value.replace(/\D\./gi, '')); 
+            });
+        }
+
+        clearIPsArray = clearIPsArray.concat(returnArr);
     }
 
-    /*
-     * function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
-}
-
-// usage example:
-var a = ['a', 1, 'a', 2, '1'];
-var unique = a.filter(onlyUnique);
-
-console.log(unique); // ['a', 1, 2, '1']
-*/
     // И тут я вновь прогоняю весь массив чтобы удалить дубликаты и все символы кроме ip. Почему я не сделал этого в предидущем фильтре? Потому что оно не хочет, может потом пойму как укротить
-    //clearIPsArray = clearIPsArray.filter((value) => { return value.replace(/\D/gi, '') });
+    clearIPsArray = clearIPsArray.filter((value, index, self) => { return self.indexOf(value) === index });
+    
     return clearIPsArray;
 }
 
