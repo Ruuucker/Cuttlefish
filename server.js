@@ -37,7 +37,7 @@ function startServer (jsonPaths) {
 	// Из за того что експресс не желает видеть переменные цикла for, буду действовать в обход
 	app.use(express.static('/'))
 
-	app.listen(8080, () => console.log('App listening on port 8080 \nhttp://localhost:8080'));
+	app.listen(8080, () => console.log('Here is your graph \nhttp://localhost:8080'));
 }
 
 module.exports = {

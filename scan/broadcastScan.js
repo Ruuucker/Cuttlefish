@@ -38,9 +38,6 @@ function scriptParseIP(array) {
 
         clearIPsArray = clearIPsArray.concat(returnArr);
     }
-
-    // И тут я вновь прогоняю весь массив чтобы удалить дубликаты и все символы кроме ip. Почему я не сделал этого в предидущем фильтре? Потому что оно не хочет, может потом пойму как укротить
-    clearIPsArray = clearIPsArray.filter((value, index, self) => { return self.indexOf(value) === index });
     
     return clearIPsArray;
 }

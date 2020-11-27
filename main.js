@@ -40,6 +40,8 @@ var dirToSave = '/tmp/';
         224.0.1.129-132 PTPv1/PTPv2
         239.255.255.250 SSDP
 
+TODO:
+Сделать чеки, оптимизацию, консольное управление, несколько режимов, чек правильности nmap с помощью линуксового traceroute -I притом несколько раз, ввести иконки на графе которые можно идентифицировать по маку, и скан snmp порта на диапазонах, чтобы можно было делать удаленные arp сканы, а еще netbios
 
 Диапазон 224.0.0.0/24 зарезервирован под link-local коммуникации. Мультикастовые пакеты с такими адресами назначения не могут выходить за пределы одного широковещательного сегмента.
 Диапазон 224.0.1.0/24 зарезервирован под протоколы, которым необходимо передавать мультикаст по всей сети, то есть проходить через маршрутизаторы.
@@ -122,7 +124,6 @@ broadcast-xdmcp-discover.nse
 
 
 
-var internalSubnets = [];
 
 // Check if we have internet connetion
 checkIP('8.8.8.8').then((tmpInfo) => {
@@ -139,37 +140,62 @@ checkIP('8.8.8.8').then((tmpInfo) => {
 */
 
 // Нужно будет пару раз посканить, чтобы наверняка, и менять протокол трейсровки
-// getFirstIPs(dirToSave, generateFileName()).then((ips) => {
+//getFirstIPs(dirToSave, generateFileName()).then((IPs) => {
 
-//     for (let i = 0; i < ips.length; i++)
 //         internalSubnets.push(convertIpIntoSubnet(ips[i]));
-    
 //     console.log(internalSubnets)
-// });
+//});
 
 var arr = [ 'broadcast-ataoe-discover', 'broadcast-bjnp-discover', 'broadcast-db2-discover', 'broadcast-dhcp6-discover', 'broadcast-dhcp-discover', 'broadcast-dns-service-discovery', 'broadcast-dropbox-listener', 'broadcast-eigrp-discovery', 'broadcast-hid-discoveryd', 'broadcast-igmp-discovery', 'broadcast-jenkins-discover', 'broadcast-listener', 'broadcast-netbios-master-browser', 'broadcast-networker-discover', 'broadcast-novell-locate', 'broadcast-ospf2-discover', 'broadcast-pc-anywhere', 'broadcast-pc-duo', 'broadcast-pim-discovery', 'broadcast-ping', 'broadcast-pppoe-discover', 'broadcast-rip-discover', 'broadcast-ripng-discover.nse', 'broadcast-sonicwall-discover.nse', 'broadcast-sybase-asa-discover.nse', 'broadcast-tellstick-discover.nse', 'broadcast-upnp-info.nse', 'broadcast-versant-locate.nse', 'broadcast-wake-on-lan.nse', 'broadcast-wpad-discover.nse', 'broadcast-wsdd-discover.nse', 'broadcast-xdmcp-discover.nse' ];
 
 // TODO Нужно добавить выбор интерфейса
 
-startScript(arr, dirToSave, generateFileName()).then((resolveArr) => {
-    let xmlPath = resolveArr[0];
-    let nmapStdout = resolveArr[1];
+// Для удобства сделал обёртку для функции, дабы можно было удобно получать IP
+async function getIPsFromScripts () {
+    return startScript(arr, dirToSave, generateFileName()).then((resolveArr) => {
+        let xmlPath = resolveArr[0];
+        let nmapStdout = resolveArr[1];
 
-    let tmpAr = convertNmapOutput(dirToSave, xmlPath, generateFileName());
-    let json = JSON.parse(tmpAr[1]);
+        let tmpAr = convertNmapOutput(dirToSave, xmlPath, generateFileName());
+        let json = JSON.parse(tmpAr[1]);
     
-    // Вывод результата nmap на экран, потом может быть мы будет куда то его записывать или что-то в этом роде
-    console.log(nmapStdout);
+        // Вывод результата nmap на экран, потом может быть мы будет куда то его записывать или что-то в этом роде
+        console.log(nmapStdout);
 
-    // Из этой функции должны вылетать IP
-    console.log(scriptParseIP(json.nmaprun.prescript.script));
-
-    /*
-        Ну и это всё должно быть как то так
-                
+        // Из этой функции вылетают IP
         let IPs = scriptParseIP(json.nmaprun.prescript.script);
-    */
+        return IPs;
+    });
+}
 
+// Ииииииии, поехали
+Promise.all([getFirstIPs(dirToSave, generateFileName()), getIPsFromScripts()]).then(IPs => {
+    var internalSubnets = [];
+    var scansPromises = [];
+
+    // Соединяю в один массив
+    IPs = IPs[0].concat(IPs[1]);
+    
+    // Заполняю массив с подсетками
+    IPs.forEach(value => {
+        internalSubnets.push(convertIpIntoSubnet(value));
+    });
+
+    // Очищаю от дубликатов
+    internalSubnets = internalSubnets.filter((value, index, self) => { return self.indexOf(value) === index });
+
+    // Перерабатываю массив в строку чтобы Nmap правильно нас понял
+    internalSubnets = internalSubnets.join(' ');
+
+    traceScan(internalSubnets, dirToSave, generateFileName()).then((xmlPath) => {
+        let jsonPaths = [];
+
+        let json = convertNmapOutput(dirToSave, xmlPath, generateFileName()); 
+
+	    jsonPaths.push(json[0]);
+        
+        startServer(jsonPaths);
+    });
 });
 
 /*
