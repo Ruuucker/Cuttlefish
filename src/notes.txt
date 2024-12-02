@@ -1,0 +1,18 @@
+### Ideas and TODOs
+make an MTU path discovery as an option to traceroute:
+https://en.wikipedia.org/wiki/Path_MTU_Discovery
+sudo traceroute --mtu 1.1.1.1
+
+Check if MTU is helpfull in terms of identification.
+
+// As a way to speed up the scanning the delete the sleep for sending packets, try to use TCP ping
+// and traceroute as a replacement of the ICMP
+
+
+// TODO here is so many lazy cloning of stuff which is unnesessery, rewrite with borrowing.
+
+- [ ] Make a command line options (as for choosing what interface to use during the scan)
+
+//todo!("Check p0f project for new recon ideas");
+
+todo make callbacks for the event loop
